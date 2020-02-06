@@ -1,4 +1,5 @@
 import decawave_ble
+from bluepy.btle import Peripheral
 from json import dumps
 
 # scanner = Scanner()
@@ -100,34 +101,49 @@ tag_devices = {}
 for k, dev in devices.items():
     # print("key: ", k, " --  device: ", dev, "    -- (", type(dev), ")")
     if dev is not None:
-        # print(dev)
-        # print(dev.addr)
-        # print("TYPE: ", type(dev))
+        print(dev)
+        print("TYPE: ", type(dev))
+        print(vars(dev))
+
+        print("Utils: \n addr: {}\n addrType: {}, adrr.iface: {}".format(dev.mac_address, dev.address_type, dev.interface))
+        # decawave_ble.get_decawave_peripheral(dev).connect(dev.mac_address, dev.address_type, dev.interface)
         try:
             data = decawave_ble.get_data(dev)
+            print(dumps(data["location_data"], indent=4))
             if data["operation_mode_data"]["device_type"] == 0:
                 tag_devices[k] = dev
             elif data["operation_mode_data"]["device_type"] == 1:
                 anchor_devices[k] = dev
         except:
-            pass
+            print("get data for device ", dev, " not working")
 
-    # for x in range(10):
-    #     dev.get
+# print(dumps(decawave_ble.get_data_multiple_devices(devices), indent=4))
 
-print("\n\n\t ANCHOR DEVICES:")
-print(dumps(decawave_ble.get_data_multiple_devices(anchor_devices), indent=4))
+#
+try:
+    print("\n\n\t ANCHOR DEVICES:")
+    for dev in anchor_devices:
+        print(dev)
+        print(vars(dev))
+    # print(dumps(decawave_ble.get_data_multiple_devices(anchor_devices), indent=4))
 
-print("\n\n\t  TAG   DEVICES:")
-print(dumps(decawave_ble.get_data_multiple_devices(anchor_devices), indent=4))
+    print("\n\n\t  TAG   DEVICES:")
+    for dev in tag_devices:
+        print(dev)
+        print(vars(dev))
+    # print(dumps(decawave_ble.get_data_multiple_devices(anchor_devices), indent=4))
+except:
+    print("problem trying to print anchor and tag devices")
 
-for x in range(10):
-    for k, dev in tag_devices.items():
-        data = decawave_ble.get_data(dev)
-        print("Device: ", k)
-        print(dumps(data["location_data"], indent=4))
 
-from json import dumps
+#
+try:
+    for x in range(10):
+        for k, dev in tag_devices.items():
+            data = decawave_ble.get_data(dev)
+            print("Device: ", k)
+            print(dumps(data["location_data"], indent=4))
+except:
+    pass
 # print("\n\n\n")
 # print(dumps(decawave_ble.get_data_multiple_devices(devices), indent=4))
-# print(decawave_ble.scan_for_decawave_devices())
